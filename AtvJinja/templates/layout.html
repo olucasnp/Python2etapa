@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1 style="background-color: aquamarine; height: 200px; width: 200px;">aaaaaaaa</h1>
+    <h1>ola, {{ nome }}</h1>
+    <h1>Nome : {{ nome }}</h1>
+    <h1>Idade : {{ idade }}</h1>
+    <h1>Dados Cadastrados : {{ Dado_usuario }}</h1>
+    <h1>Alunos : {{ Alunos }}</h1>
+
+    {% if Nota >= 7 %}
+    <p>Aprovado</p>
+    {% else %}
+    <p>Reprovado</p>
+    {% endif %}
+</body>
+</html>

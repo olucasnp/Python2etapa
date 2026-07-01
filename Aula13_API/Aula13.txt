@@ -1,0 +1,385 @@
+================================================================================
+AULA 13 — INTRODUÇÃO A API REST COM FLASK
+Do HTML para JSON: a mesma aplicação, outro tipo de resposta
+================================================================================
+
+Profª Janaína Duarte 
+
+1. O QUE VOCÊ JÁ SABE (RECAPITULANDO)
+--------------------------------------
+
+Nas aulas anteriores, cada rota Flask seguia este fluxo:
+
+  Navegador  →  GET /filmes/populares  →  Controller  →  render_template(...)
+                                                              ↓
+                                                    HTML + Jinja2 na tela
+
+O Controller lia dados (Model, Service ou banco) e devolvia uma **página web**.
+O navegador recebia HTML e montava a interface para o usuário humano.
+
+Isso continua válido — sites como StreamFlix (Aula 12) funcionam exatamente assim.
+
+
+2. API REST: EXTENSÃO NATURAL DO FLASK
+---------------------------------------
+
+Construir uma **API REST** com Flask não é outra tecnologia. É o **mesmo Flask**,
+com a **mesma estrutura MVC**, com **Blueprints** e **Models** iguais.
+
+A única mudança central está na **última linha do Controller**:
+
+  Site tradicional (View HTML):
+    return render_template("produtos/lista.html", produtos=produtos)
+
+  API REST (dados estruturados):
+    return jsonify([{"id": p.id, "nome": p.nome, "preco": p.preco} for p in produtos])
+
+Em vez de montar HTML para o navegador desenhar a tela, a rota devolve **JSON** —
+texto estruturado que qualquer cliente pode consumir: app mobile, React, Vue,
+Postman, outro servidor Python, etc.
+
+                    ┌─────────────────────────────────────┐
+                    │           MESMO BACKEND               │
+                    │  Model + Service + Controller       │
+                    └──────────────┬──────────────────────┘
+                                   │
+              ┌────────────────────┴────────────────────┐
+              │                                         │
+              ▼                                         ▼
+    render_template(...)                         jsonify(...)
+    (resposta HTML)                              (resposta JSON)
+              │                                         │
+              ▼                                         ▼
+    Navegador mostra página                    App / SPA / Postman
+    para o usuário final                       consome os dados
+
+
+3. ONDE A API REST ENTRA NO LUGAR DA RENDERIZAÇÃO?
+---------------------------------------------------
+
+| Situação                         | Usar HTML (render_template) | Usar API REST (jsonify)      |
+|----------------------------------|-----------------------------|------------------------------|
+| Site para humanos no navegador   | Sim                         | Não (ou só em partes)        |
+| App mobile (Android/iOS)         | Não                         | Sim                          |
+| Frontend separado (React, Vue)   | Não                         | Sim                          |
+| Integração entre sistemas        | Não                         | Sim                          |
+| Testes automatizados de backend  | Raro                        | Sim                          |
+
+Na prática, muitos projetos têm **as duas coisas**:
+
+  /produtos/          → HTML para quem acessa pelo navegador
+  /api/produtos       → JSON para apps e integrações
+
+O **Model** (banco, regras) e muitas vezes o **Service** são **compartilhados**.
+Só muda a "casca" de saída: template HTML ou JSON.
+
+No projeto desta aula (pasta Aula13/), você verá exatamente isso lado a lado.
+
+
+4. O QUE É REST?
+----------------
+
+REST (Representational State Transfer) é um **estilo de arquitetura** para APIs web.
+Não é uma biblioteca — são **convenções** sobre como organizar URLs, verbos HTTP
+e respostas.
+
+Princípios que usamos nesta aula:
+
+  • **Recursos** identificados por URL
+      /api/produtos      → coleção de produtos
+      /api/produtos/5    → um produto específico (id = 5)
+
+  • **Verbos HTTP** com significado
+      GET    → ler / listar
+      POST   → criar novo
+      PUT    → atualizar (substituir)
+      DELETE → remover
+
+  • **Respostas padronizadas**
+      200 OK           → sucesso na leitura ou atualização
+      201 Created      → recurso criado com POST
+      400 Bad Request  → dados inválidos enviados pelo cliente
+      404 Not Found    → recurso não existe
+      204 No Content   → sucesso no DELETE (sem corpo na resposta)
+
+  • **Formato JSON** no corpo das mensagens (Content-Type: application/json)
+
+
+5. A FUNÇÃO jsonify()
+---------------------
+
+jsonify() vem do Flask (from flask import jsonify).
+
+O que ela faz:
+
+  1. Converte dict ou list Python em **JSON** (texto)
+  2. Define o header HTTP **Content-Type: application/json**
+  3. Permite informar o **código de status** HTTP
+
+Exemplos:
+
+  # Lista de produtos
+  return jsonify([
+      {"id": 1, "nome": "Mouse", "preco": 49.90},
+      {"id": 2, "nome": "Teclado", "preco": 129.00},
+  ])
+
+  # Um único objeto
+  return jsonify({"id": 1, "nome": "Mouse", "preco": 49.90})
+
+  # Erro com status 404
+  return jsonify({"erro": "Produto não encontrado"}), 404
+
+  # Criação com status 201
+  return jsonify({"id": 3, "mensagem": "Produto criado"}), 201
+
+Comparação direta com render_template:
+
+  # HTML — View Jinja2
+  return render_template("produtos/lista.html", produtos=produtos)
+
+  # JSON — mesmos dados, outro formato
+  return jsonify([
+      {"id": p.id, "nome": p.nome, "preco": p.preco}
+      for p in produtos
+  ])
+
+Dica: jsonify() só aceita tipos serializáveis em JSON (str, int, float, bool,
+list, dict, None). Objetos datetime precisam virar string: str(produto.data_criacao).
+
+
+6. ENDPOINTS — EXEMPLO COMPLETO (/api/produtos)
+------------------------------------------------
+
+Blueprint típico:
+
+  api_bp = Blueprint("api_produtos", __name__, url_prefix="/api")
+
+Rota                          Método   O que faz
+----------------------------  -------  ------------------------------------------
+GET  /api/produtos            GET      Lista todos os produtos
+GET  /api/produtos/5          GET      Detalhe do produto id=5
+POST /api/produtos            POST     Cria produto (JSON no body)
+PUT  /api/produtos/5          PUT      Atualiza produto id=5
+DELETE /api/produtos/5        DELETE   Remove produto id=5
+
+
+6.1) GET /api/produtos — listar
+
+  @api_bp.route("/produtos", methods=["GET"])
+  def listar():
+      produtos = Produto.listar()
+      return jsonify([p.para_dict() for p in produtos])
+
+  Resposta (200):
+  [
+    {"id": 1, "nome": "Mouse USB", "preco": 49.9, "estoque": 30},
+    {"id": 2, "nome": "Teclado mecânico", "preco": 299.0, "estoque": 12}
+  ]
+
+
+6.2) GET /api/produtos/5 — detalhe
+
+  @api_bp.route("/produtos/<int:produto_id>", methods=["GET"])
+  def detalhe(produto_id):
+      produto = db.session.get(Produto, produto_id)
+      if not produto:
+          return jsonify({"erro": "Produto não encontrado"}), 404
+      return jsonify(produto.para_dict())
+
+  Resposta (200):
+  {"id": 5, "nome": "Monitor 24\"", "preco": 899.0, "estoque": 5}
+
+  Resposta (404):
+  {"erro": "Produto não encontrado"}
+
+
+6.3) POST /api/produtos — criar
+
+  O cliente envia JSON no corpo da requisição (não form HTML).
+
+  @api_bp.route("/produtos", methods=["POST"])
+  def criar():
+      dados = request.get_json()
+      if not dados:
+          return jsonify({"erro": "Envie JSON no body"}), 400
+      produto = Produto(
+          nome=dados["nome"],
+          preco=float(dados["preco"]),
+          estoque=int(dados.get("estoque", 0)),
+      )
+      db.session.add(produto)
+      db.session.commit()
+      return jsonify(produto.para_dict()), 201
+
+  Exemplo de body (Postman ou curl):
+  {
+    "nome": "Webcam HD",
+    "preco": 159.90,
+    "estoque": 20
+  }
+
+
+6.4) PUT /api/produtos/5 — atualizar
+
+  @api_bp.route("/produtos/<int:produto_id>", methods=["PUT"])
+  def atualizar(produto_id):
+      produto = db.session.get(Produto, produto_id)
+      if not produto:
+          return jsonify({"erro": "Produto não encontrado"}), 404
+      dados = request.get_json() or {}
+      produto.nome = dados.get("nome", produto.nome)
+      produto.preco = float(dados.get("preco", produto.preco))
+      produto.estoque = int(dados.get("estoque", produto.estoque))
+      db.session.commit()
+      return jsonify(produto.para_dict())
+
+
+6.5) DELETE /api/produtos/5 — remover
+
+  @api_bp.route("/produtos/<int:produto_id>", methods=["DELETE"])
+  def excluir(produto_id):
+      produto = db.session.get(Produto, produto_id)
+      if not produto:
+          return jsonify({"erro": "Produto não encontrado"}), 404
+      db.session.delete(produto)
+      db.session.commit()
+      return "", 204
+
+
+7. request.get_json() — LENDO O BODY
+------------------------------------
+
+Em rotas HTML você usa request.form (formulário) ou request.args (query string).
+
+Na API REST, o corpo vem em JSON:
+
+  dados = request.get_json()
+
+  nome = dados["nome"]           # campo obrigatório
+  estoque = dados.get("estoque", 0)   # opcional com padrão
+
+Query string continua igual:
+  GET /api/produtos?nome=mouse  →  request.args.get("nome")
+
+
+8. ESTRUTURA DO PROJETO AULA13
+------------------------------
+
+Aula13/
+├── app.py
+├── Aula13.txt              ← este material
+├── requirements.txt
+├── models/
+│   ├── base.py
+│   └── produto.py          → tabela produtos no SQLite
+├── controllers/
+│   ├── produtos_controller.py    → rotas HTML (/produtos/...)
+│   └── api/
+│       └── produtos_api.py       → rotas REST (/api/produtos/...)
+└── views/
+    └── templates/          → páginas para comparar com a API
+
+Duas "portas de saída", um só backend:
+
+  produtos_controller.py  →  render_template  →  humano no navegador
+  produtos_api.py         →  jsonify          →  máquinas / apps / Postman
+
+
+9. COMO RODAR E TESTAR
+----------------------
+
+Instalar e subir:
+
+  cd flask/Aula13
+  pip install -r requirements.txt
+  python app.py
+
+No navegador (HTML):
+  http://127.0.0.1:5000/produtos/
+  http://127.0.0.1:5000/produtos/1
+
+No navegador ou Postman (JSON):
+  http://127.0.0.1:5000/api/produtos
+  http://127.0.0.1:5000/api/produtos/1
+
+Testar POST com curl (PowerShell):
+
+  curl -X POST http://127.0.0.1:5000/api/produtos `
+    -H "Content-Type: application/json" `
+    -d "{\"nome\": \"Headset\", \"preco\": 199.90, \"estoque\": 8}"
+
+Testar PUT:
+
+  curl -X PUT http://127.0.0.1:5000/api/produtos/1 `
+    -H "Content-Type: application/json" `
+    -d "{\"preco\": 39.90}"
+
+Testar DELETE:
+
+  curl -X DELETE http://127.0.0.1:5000/api/produtos/3
+
+
+10. FLUXO COMPARADO (MESMA CONSULTA AO BANCO)
+---------------------------------------------
+
+  LISTAR PRODUTOS — rota HTML
+  ---------------------------
+  GET /produtos/
+       → Produto.listar()          (Model — igual)
+       → render_template(...)      (View HTML)
+       → navegador exibe tabela
+
+  LISTAR PRODUTOS — rota API
+  --------------------------
+  GET /api/produtos
+       → Produto.listar()          (Model — igual)
+       → jsonify([...])            (resposta JSON)
+       → cliente parseia o JSON
+
+
+11. RELAÇÃO COM AULAS ANTERIORES
+--------------------------------
+
+  Aula  9  → você **consumiu** APIs externas (requests.get na TMDB, etc.)
+  Aula 11  → cenários resolvidos já têm /api/v1/... (jsonify + Blueprint)
+  Aula 12  → site HTML completo; a TMDB é API que o Service consome
+  Aula 13  → agora você **expõe** sua própria API REST com Flask
+
+A TMDB na Aula 12 e a sua API na Aula 13 seguem a mesma lógica:
+URL + verbo HTTP + JSON. A diferença é o papel: na 12 você é cliente; na 13
+você é o servidor.
+
+
+12. RESUMO PARA A PROVA / REVISÃO
+---------------------------------
+
+  • API REST no Flask = mesmas rotas, Models e Blueprints; troca render_template
+    por jsonify.
+
+  • jsonify(dict ou list) → JSON + Content-Type application/json.
+
+  • Segundo valor no return define status: return jsonify({...}), 404
+
+  • GET lê, POST cria, PUT atualiza, DELETE remove.
+
+  • URL de recurso: /api/produtos (coleção) e /api/produtos/5 (item).
+
+  • Body JSON: request.get_json()
+
+  • HTML e API podem coexistir no mesmo projeto para públicos diferentes.
+
+
+13. ATIVIDADE SUGERIDA (1 ponto)
+--------------------------------
+
+Partir do projeto Aula13 ou de um cenário da Aula 11 e:
+
+  1. Criar Blueprint api com url_prefix="/api"
+  2. Implementar GET listagem e GET detalhe de um recurso do seu Model
+  3. Implementar POST para criar um registro
+  4. Testar no Postman ou curl e colar print ou log das respostas JSON
+
+Bônus: adicionar PUT e DELETE + tratamento 404 com mensagem {"erro": "..."}.
+
+================================================================================

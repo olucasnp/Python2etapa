@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ produto.nome }} — LojaTech{% endblock %}
+
+{% block content %}
+<p><a href="{{ url_for('produtos.lista') }}">&larr; Voltar</a></p>
+<h1>{{ produto.nome }}</h1>
+<p class="subtitulo">Rota HTML: <code>GET /produtos/{{ produto.id }}</code></p>
+
+<dl class="detalhe">
+    <dt>ID</dt><dd>{{ produto.id }}</dd>
+    <dt>Preço</dt><dd>R$ {{ "%.2f"|format(produto.preco) }}</dd>
+    <dt>Estoque</dt><dd>{{ produto.estoque }} un.</dd>
+</dl>
+
+<p>
+    Equivalente em API:
+    <a href="/api/produtos/{{ produto.id }}" target="_blank">
+        GET /api/produtos/{{ produto.id }}
+    </a>
+</p>
+{% endblock %}

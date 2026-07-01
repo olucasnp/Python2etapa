@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}Produtos — LojaTech{% endblock %}
+
+{% block content %}
+<h1>Catálogo de produtos</h1>
+<p class="subtitulo">Rota HTML: <code>GET /produtos/</code></p>
+
+<table class="tabela">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Preço</th>
+            <th>Estoque</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in produtos %}
+        <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.nome }}</td>
+            <td>R$ {{ "%.2f"|format(p.preco) }}</td>
+            <td>{{ p.estoque }}</td>
+            <td><a href="{{ url_for('produtos.detalhe', produto_id=p.id) }}">Ver</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">Nenhum produto cadastrado.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

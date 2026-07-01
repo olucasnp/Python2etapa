@@ -1,0 +1,87 @@
+* { box-sizing: border-box; }
+
+body {
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    background: #f4f6f8;
+    color: #1a1a1a;
+}
+
+.nav {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: #1e3a5f;
+}
+
+.nav a {
+    color: #e8eef5;
+    text-decoration: none;
+}
+
+.nav-brand {
+    font-weight: 700;
+    margin-right: auto;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.aviso-api {
+    background: #e8f4fd;
+    border-left: 4px solid #2563eb;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.subtitulo {
+    color: #555;
+    margin-top: -0.5rem;
+}
+
+code, pre {
+    background: #eef1f4;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+pre {
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.tabela {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.tabela th,
+.tabela td {
+    padding: 0.65rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.tabela th {
+    background: #f9fafb;
+}
+
+.detalhe dt {
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.detalhe dd {
+    margin: 0.15rem 0 0;
+}

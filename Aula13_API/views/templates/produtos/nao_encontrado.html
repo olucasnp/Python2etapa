@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block title %}Não encontrado — LojaTech{% endblock %}
+
+{% block content %}
+<h1>Produto #{{ produto_id }} não encontrado</h1>
+<p>A rota HTML retornou 404. Na API, a resposta seria:</p>
+<pre>{"erro": "Produto não encontrado"}</pre>
+<p><a href="{{ url_for('produtos.lista') }}">Voltar ao catálogo</a></p>
+{% endblock %}

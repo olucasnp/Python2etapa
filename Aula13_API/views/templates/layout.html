@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Aula 13 — Loja{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="nav">
+        <a class="nav-brand" href="{{ url_for('produtos.lista') }}">LojaTech</a>
+        <a href="{{ url_for('produtos.lista') }}">Produtos (HTML)</a>
+        <a href="/api/produtos" target="_blank">API JSON</a>
+    </nav>
+
+    <main class="container">
+        <div class="aviso-api">
+            Esta página usa <strong>render_template</strong> (HTML).
+            A mesma listagem em JSON: <a href="/api/produtos" target="_blank">GET /api/produtos</a>
+        </div>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

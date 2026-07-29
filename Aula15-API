@@ -1,1 +1,95 @@
 
+Windows PowerShell
+Copyright (C) Microsoft Corporation. Todos os direitos reservados.
+
+PS C:\Users\12401730> Invoke-RestMethod http://127.0.0.1:5000/api/livros `
+>>    -Method POST `
+>>    -ContentType "application/json" `
+>>    -Body '{"titulo":"Toy Story","autor":"Pixar","ano":2026}'
+
+
+ano          : 2026
+autor        : Pixar
+data_criacao : 2026-07-29 09:27:58.878161
+id           : 5
+titulo       : Toy Story
+
+
+
+PS C:\Users\12401730> Invoke-RestMethod http://127.0.0.1:5000/api/livros `
+>>    -Method POST `
+>>    -ContentType "application/json" `
+>>    -Body '{"titulo":"Toy Story 2","autor":"Pixar","ano":2026}'
+
+
+ano          : 2026
+autor        : Pixar
+data_criacao : 2026-07-29 09:28:03.275996
+id           : 6
+titulo       : Toy Story 2
+
+
+
+PS C:\Users\12401730> Invoke-RestMethod http://127.0.0.1:5000/api/livros `
+>>    -Method POST `
+>>    -ContentType "application/json" `
+>>    -Body '{"titulo":"Toy Story 3","autor":"Pixar","ano":2026}'
+
+
+ano          : 2026
+autor        : Pixar
+data_criacao : 2026-07-29 09:28:07.040574
+id           : 7
+titulo       : Toy Story 3
+
+
+
+PS C:\Users\12401730> Invoke-RestMethod http://127.0.0.1:5000/api/livros `
+>>    -Method POST `
+>>    -ContentType "application/json" `
+>>    -Body '{"titulo":"Toy Story 4","autor":"Pixar","ano":2026}'
+
+
+ano          : 2026
+autor        : Pixar
+data_criacao : 2026-07-29 09:28:10.791843
+id           : 8
+titulo       : Toy Story 4
+
+
+
+PS C:\Users\12401730> Invoke-RestMethod http://127.0.0.1:5000/api/livros `
+>>    -Method POST `
+>>    -ContentType "application/json" `
+>>    -Body '{"titulo":"Toy Story 5","autor":"Pixar","ano":2026}'
+
+
+ano          : 2026
+autor        : Pixar
+data_criacao : 2026-07-29 09:28:14.851997
+id           : 9
+titulo       : Toy Story 5
+
+
+
+PS C:\Users\12401730> Invoke-RestMethod http://127.0.0.1:5000/api/livros `
+>>    -Method POST `
+>>    -ContentType "application/json" `
+>>    -Body '{"titulo":"Tropa de Elite","autor":"Bope","ano":2026}'
+
+
+ano          : 2026
+autor        : Bope
+data_criacao : 2026-07-29 09:28:46.746235
+id           : 10
+titulo       : Tropa de Elite
+
+
+
+PS C:\Users\12401730> Invoke-RestMethod http://127.0.0.1:5000/api/livros/5 -Method DELETE
+
+PS C:\Users\12401730> Invoke-RestMethod http://127.0.0.1:5000/api/livros/6 -Method DELETE
+
+PS C:\Users\12401730> Invoke-RestMethod http://127.0.0.1:5000/api/livros/7 -Method DELETE
+
+PS C:\Users\12401730>

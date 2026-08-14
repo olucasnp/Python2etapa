@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ "Editar Tarefa" if tarefa else "Nova Tarefa" }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h3 class="card-title mb-3">
+          <i class="bi bi-{{ 'pencil-square' if tarefa else 'plus-circle' }}"></i>
+          {{ "Editar Tarefa" if tarefa else "Nova Tarefa" }}
+        </h3>
+        <form method="POST">
+          <div class="mb-3">
+            <label class="form-label">Título</label>
+            <input type="text" class="form-control" name="titulo" required
+                   value="{{ tarefa.titulo if tarefa else '' }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descrição</label>
+            <textarea class="form-control" name="descricao" rows="3">{{ tarefa.descricao if tarefa else '' }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select class="form-select" name="status">
+              <option value="pendente" {{ "selected" if tarefa and tarefa.status == "pendente" }}>Pendente</option>
+              <option value="em_andamento" {{ "selected" if tarefa and tarefa.status == "em_andamento" }}>Em andamento</option>
+              <option value="concluida" {{ "selected" if tarefa and tarefa.status == "concluida" }}>Concluída</option>
+            </select>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

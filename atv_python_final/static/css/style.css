@@ -1,0 +1,45 @@
+body.modo-escuro {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+body.modo-escuro .card {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border-color: #333;
+}
+
+body.modo-escuro footer {
+  color: #999;
+}
+
+body.modo-escuro .form-control,
+body.modo-escuro .form-select {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+/* cores por status conforme desafio: pendente amarelo, em andamento azul, concluida verde */
+.card-status-pendente {
+  border-left: 5px solid #ffc107;
+}
+.card-status-em_andamento {
+  border-left: 5px solid #0d6efd;
+}
+.card-status-concluida {
+  border-left: 5px solid #198754;
+}
+
+.status-badge-pendente {
+  background-color: #ffc107;
+  color: #212529;
+}
+.status-badge-em_andamento {
+  background-color: #0d6efd;
+  color: #fff;
+}
+.status-badge-concluida {
+  background-color: #198754;
+  color: #fff;
+}

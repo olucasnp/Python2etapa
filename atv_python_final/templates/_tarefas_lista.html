@@ -1,0 +1,29 @@
+{% if tarefas|length == 0 %}
+  <p class="text-muted">Nenhuma tarefa encontrada.</p>
+{% else %}
+  {% for tarefa in tarefas %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 shadow-sm card-status-{{ tarefa.status }}">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <h5 class="card-title">{{ tarefa.titulo }}</h5>
+          <span class="badge status-badge-{{ tarefa.status }}">
+            {{ {"pendente": "Pendente", "em_andamento": "Em andamento", "concluida": "Concluída"}[tarefa.status] }}
+          </span>
+        </div>
+        <p class="card-text">{{ tarefa.descricao or "Sem descrição." }}</p>
+      </div>
+      <div class="card-footer bg-transparent d-flex justify-content-end gap-2">
+        <a href="{{ url_for('editar_tarefa', tarefa_id=tarefa.id) }}" class="btn btn-sm btn-outline-primary" title="Editar">
+          <i class="bi bi-pencil-square"></i>
+        </a>
+        <form method="POST" action="{{ url_for('excluir_tarefa', tarefa_id=tarefa.id) }}" onsubmit="return confirm('Excluir esta tarefa?');">
+          <button type="submit" class="btn btn-sm btn-outline-danger" title="Excluir">
+            <i class="bi bi-trash"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% endif %}
